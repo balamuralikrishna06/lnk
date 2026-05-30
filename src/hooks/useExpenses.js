@@ -1,15 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
-const INITIAL_EXPENSES = [
-  { id: 'exp-1', name: 'Venue Deposit', amount: 15000, category: 'Venue', status: 'paid', date: '2026-05-10', wedding_id: 'default' },
-  { id: 'exp-2', name: 'Wedding Rings', amount: 4500, category: 'Attire', status: 'paid', date: '2026-05-15', wedding_id: 'default' },
-  { id: 'exp-3', name: 'Catering Deposit', amount: 2500, category: 'Catering', status: 'paid', date: '2026-05-18', wedding_id: 'default' },
-  { id: 'exp-4', name: 'DJ Downpayment', amount: 2000, category: 'Music', status: 'pending', date: '2026-05-20', wedding_id: 'default' },
-  { id: 'exp-5', name: 'Bridal Bouquet Booking', amount: 3500, category: 'Florals', status: 'paid', date: '2026-05-22', wedding_id: 'default' },
-  { id: 'exp-6', name: 'Photography Deposit', amount: 6000, category: 'Photography', status: 'paid', date: '2026-05-25', wedding_id: 'default' },
-  { id: 'exp-7', name: 'Printed Programs', amount: 500, category: 'Miscellaneous', status: 'pending', date: '2026-05-28', wedding_id: 'default' },
-];
+// No mock data stored here
 
 export default function useExpenses(weddingId) {
   const [expenses, setExpenses] = useState([]);
@@ -17,12 +9,6 @@ export default function useExpenses(weddingId) {
   const [error, setError] = useState(null);
 
   const fetchExpenses = async () => {
-    // If client is using mock keys, load mock data to prevent blank screen
-    if (supabase.supabaseUrl.includes('mock.supabase.co')) {
-      setExpenses(INITIAL_EXPENSES);
-      return;
-    }
-
     setLoading(true);
     setError(null);
     try {
@@ -60,9 +46,7 @@ export default function useExpenses(weddingId) {
     // Optimistic Update
     setExpenses((prev) => [optimisticEntry, ...prev]);
 
-    if (supabase.supabaseUrl.includes('mock.supabase.co')) {
-      return optimisticEntry;
-    }
+
 
     try {
       // TODO: Connect to Supabase
@@ -90,9 +74,7 @@ export default function useExpenses(weddingId) {
     const original = expenses.find((exp) => exp.id === id);
     setExpenses((prev) => prev.filter((exp) => exp.id !== id));
 
-    if (supabase.supabaseUrl.includes('mock.supabase.co')) {
-      return;
-    }
+
 
     try {
       // TODO: Connect to Supabase
@@ -121,9 +103,7 @@ export default function useExpenses(weddingId) {
       prev.map((exp) => (exp.id === id ? { ...exp, status: nextStatus } : exp))
     );
 
-    if (supabase.supabaseUrl.includes('mock.supabase.co')) {
-      return;
-    }
+
 
     try {
       // TODO: Connect to Supabase

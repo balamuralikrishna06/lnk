@@ -1,17 +1,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
-const INITIAL_PHOTOS = [
-  { id: 'photo-1', url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80', caption: 'Our Ceremony Venue', date: '2027-06-20', wedding_id: 'default' },
-  { id: 'photo-2', url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80', caption: 'Reception Dinner Tables', date: '2027-06-20', wedding_id: 'default' },
-  { id: 'photo-3', url: 'https://images.unsplash.com/photo-1543157148-f68f2d47a622?auto=format&fit=crop&w=800&q=80', caption: 'Bridal Bouquet Floral Highlights', date: '2027-06-20', wedding_id: 'default' },
-  { id: 'photo-4', url: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=800&q=80', caption: 'Intertwined Wedding Rings', date: '2027-06-20', wedding_id: 'default' },
-  { id: 'photo-5', url: 'https://images.unsplash.com/photo-1535254973040-607b474cb50d?auto=format&fit=crop&w=800&q=80', caption: 'Decadent Wedding Cake & Patisserie', date: '2027-06-20', wedding_id: 'default' },
-  { id: 'photo-6', url: 'https://images.unsplash.com/photo-1519225495810-7517c300ea97?auto=format&fit=crop&w=800&q=80', caption: 'Pre-wedding photoshoot portraits', date: '2027-06-19', wedding_id: 'default' },
-];
+// No mock data stored here
 
 export default function useAlbum(weddingId) {
-  const [photos, setPhotos] = useState(INITIAL_PHOTOS);
+  const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -26,10 +19,6 @@ export default function useAlbum(weddingId) {
   };
 
   const fetchPhotos = async () => {
-    if (supabase.supabaseUrl.includes('mock.supabase.co')) {
-      return;
-    }
-
     setLoading(true);
     setError(null);
     try {
@@ -83,9 +72,7 @@ export default function useAlbum(weddingId) {
 
     setPhotos((prev) => [optimisticEntry, ...prev]);
 
-    if (supabase.supabaseUrl.includes('mock.supabase.co')) {
-      return optimisticEntry;
-    }
+
 
     try {
       // TODO: Connect to Supabase
