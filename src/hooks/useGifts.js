@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
 const INITIAL_GIFTS = [
-  { id: 'gift-1', donor_name: 'Eleanor & James Wright', gift_type: 'cash', amount: 500, gift_name: '$500', thank_you_status: 'pending', registry_item_name: 'Honeymoon Fund', created_at: '2026-05-30T10:15:00Z', wedding_id: 'default' },
+  { id: 'gift-1', donor_name: 'Eleanor & James Wright', gift_type: 'cash', amount: 500, gift_name: '₹500', thank_you_status: 'pending', registry_item_name: 'Honeymoon Fund', created_at: '2026-05-30T10:15:00Z', wedding_id: 'default' },
   { id: 'gift-2', donor_name: 'The Smith Family', gift_type: 'physical', amount: null, gift_name: 'Espresso Machine', thank_you_status: 'pending', registry_item_name: 'Registry Item', created_at: '2026-05-29T16:45:00Z', wedding_id: 'default' },
-  { id: 'gift-3', donor_name: 'Aunt Martha', gift_type: 'cash', amount: 250, gift_name: '$250', thank_you_status: 'sent', registry_item_name: 'Honeymoon Fund', created_at: '2026-05-28T09:30:00Z', wedding_id: 'default' },
-  { id: 'gift-4', donor_name: 'The Davidson Cousins', gift_type: 'cash', amount: 1200, gift_name: '$1,200', thank_you_status: 'sent', registry_item_name: 'Honeymoon Fund', created_at: '2026-05-27T14:20:00Z', wedding_id: 'default' },
-  { id: 'gift-5', donor_name: 'Parents of the Bride', gift_type: 'cash', amount: 10000, gift_name: '$10,000', thank_you_status: 'pending', registry_item_name: 'Honeymoon Fund', created_at: '2026-05-26T11:05:00Z', wedding_id: 'default' },
+  { id: 'gift-3', donor_name: 'Aunt Martha', gift_type: 'cash', amount: 250, gift_name: '₹250', thank_you_status: 'sent', registry_item_name: 'Honeymoon Fund', created_at: '2026-05-28T09:30:00Z', wedding_id: 'default' },
+  { id: 'gift-4', donor_name: 'The Davidson Cousins', gift_type: 'cash', amount: 1200, gift_name: '₹1,200', thank_you_status: 'sent', registry_item_name: 'Honeymoon Fund', created_at: '2026-05-27T14:20:00Z', wedding_id: 'default' },
+  { id: 'gift-5', donor_name: 'Parents of the Bride', gift_type: 'cash', amount: 10000, gift_name: '₹10,000', thank_you_status: 'pending', registry_item_name: 'Honeymoon Fund', created_at: '2026-05-26T11:05:00Z', wedding_id: 'default' },
   { id: 'gift-6', donor_name: 'Sarah & Michael Green', gift_type: 'physical', amount: null, gift_name: 'KitchenAid Stand Mixer', thank_you_status: 'sent', registry_item_name: 'Kitchen Registry', created_at: '2026-05-25T18:00:00Z', wedding_id: 'default' }
 ];
 

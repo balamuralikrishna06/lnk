@@ -23,7 +23,7 @@ export default function GiftFormModal({ isOpen, onClose, onAddGift }) {
     if (giftType === 'cash') {
       const parsedAmount = parseFloat(amount);
       newGift.amount = isNaN(parsedAmount) ? 0 : parsedAmount;
-      newGift.gift_name = `$${newGift.amount.toLocaleString()}`;
+      newGift.gift_name = `₹${newGift.amount.toLocaleString()}`;
     } else {
       newGift.gift_name = giftName || 'Registry Item';
       newGift.amount = null;
@@ -129,7 +129,7 @@ export default function GiftFormModal({ isOpen, onClose, onAddGift }) {
                 <>
                   <div>
                     <label className="block font-label-md text-label-md uppercase tracking-wider text-secondary mb-2">
-                      Contribution Amount ($ USD)
+                      Contribution Amount (₹ INR)
                     </label>
                     <input
                       type="number"

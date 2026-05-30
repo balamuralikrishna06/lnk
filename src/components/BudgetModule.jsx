@@ -162,7 +162,7 @@ export default function BudgetModule({ expenses }) {
                 Remaining
               </span>
               <span className="font-display-lg-mobile text-display-lg-mobile text-primary font-bold">
-                ${remainingBudget.toLocaleString()}
+                ₹{remainingBudget.toLocaleString()}
               </span>
               <span className="font-caption text-caption text-secondary mt-1">
                 {Math.round((remainingBudget / totalBudget) * 100)}% left
@@ -208,9 +208,9 @@ export default function BudgetModule({ expenses }) {
                       {cat.name}
                     </span>
                     <div className="text-right font-medium">
-                      <span className="text-[#2d2d2d]">${cat.spent.toLocaleString()}</span>
+                      <span className="text-[#2d2d2d]">₹{cat.spent.toLocaleString()}</span>
                       <span className="text-secondary mx-1">/</span>
-                      <span className="text-secondary">${cat.allocated.toLocaleString()}</span>
+                      <span className="text-secondary">₹{cat.allocated.toLocaleString()}</span>
                     </div>
                   </div>
 
@@ -243,10 +243,10 @@ export default function BudgetModule({ expenses }) {
                   <div className="flex justify-between text-caption font-semibold">
                     <span className={isOverspent ? 'text-error' : 'text-secondary'}>
                       {isOverspent
-                        ? `Overspent by $${(cat.spent - cat.allocated).toLocaleString()}`
+                        ? `Overspent by ₹${(cat.spent - cat.allocated).toLocaleString()}`
                         : `${spentPercentage}% Spent`}
                     </span>
-                    <span className="text-secondary">${cat.remaining.toLocaleString()} remaining</span>
+                    <span className="text-secondary">₹{cat.remaining.toLocaleString()} remaining</span>
                   </div>
                 </div>
               );

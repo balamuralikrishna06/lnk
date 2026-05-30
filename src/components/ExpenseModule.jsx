@@ -133,7 +133,7 @@ export default function ExpenseModule({
                     borderRadius: '8px',
                     fontFamily: 'Inter',
                   }}
-                  formatter={(value) => [`$${value.toLocaleString()}`, 'Spent']}
+                  formatter={(value) => [`₹${value.toLocaleString()}`, 'Spent']}
                 />
                 <Bar dataKey="spent" fill="#c5a059" radius={[4, 4, 0, 0]}>
                   {chartData.map((entry, index) => (
@@ -207,7 +207,7 @@ export default function ExpenseModule({
                     <td className="py-4 font-medium text-[#2d2d2d]">{exp.name}</td>
                     <td className="py-4 text-secondary">{exp.category}</td>
                     <td className="py-4 text-secondary">{exp.date}</td>
-                    <td className="py-4 font-semibold text-[#2d2d2d]">${exp.amount.toLocaleString()}</td>
+                    <td className="py-4 font-semibold text-[#2d2d2d]">₹{exp.amount.toLocaleString()}</td>
                     <td className="py-4">
                       <button
                         onClick={() => handleToggleStatus(exp.id, exp.status)}
@@ -284,7 +284,7 @@ export default function ExpenseModule({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block font-label-md text-label-md uppercase tracking-wider text-secondary mb-2">
-                      Amount ($ USD)
+                      Amount (₹ INR)
                     </label>
                     <input
                       type="number"

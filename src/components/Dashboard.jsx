@@ -182,7 +182,7 @@ export default function Dashboard({
               {budgetSpentPercent}%
             </h4>
             <p className="font-caption text-caption text-secondary">
-              ${totalSpent.toLocaleString()} of ${totalBudget.toLocaleString()} allocated
+              ₹{totalSpent.toLocaleString()} of ₹{totalBudget.toLocaleString()} allocated
             </p>
           </div>
           <div className="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden mt-6">
@@ -206,7 +206,7 @@ export default function Dashboard({
               {registryPercent}%
             </h4>
             <p className="font-caption text-caption text-secondary">
-              ${registryReceived.toLocaleString()} of ${registryGoal.toLocaleString()} honeymoon goal
+              ₹{registryReceived.toLocaleString()} of ₹{registryGoal.toLocaleString()} honeymoon goal
             </p>
           </div>
           <div className="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden mt-6">

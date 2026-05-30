@@ -10,7 +10,7 @@ const INITIAL_GIFTS = [
     donor_name: 'Eleanor & James Wright',
     gift_type: 'cash',
     amount: 500,
-    gift_name: '$500',
+    gift_name: '₹500',
     thank_you_status: 'pending',
     registry_item_name: 'Honeymoon Fund',
     created_at: '2026-05-30T10:15:00Z',
@@ -30,7 +30,7 @@ const INITIAL_GIFTS = [
     donor_name: 'Aunt Martha',
     gift_type: 'cash',
     amount: 250,
-    gift_name: '$250',
+    gift_name: '₹250',
     thank_you_status: 'sent',
     registry_item_name: 'Honeymoon Fund',
     created_at: '2026-05-28T09:30:00Z',
@@ -40,7 +40,7 @@ const INITIAL_GIFTS = [
     donor_name: 'The Davidson Cousins',
     gift_type: 'cash',
     amount: 1200,
-    gift_name: '$1,200',
+    gift_name: '₹1,200',
     thank_you_status: 'sent',
     registry_item_name: 'Honeymoon Fund',
     created_at: '2026-05-27T14:20:00Z',
@@ -50,7 +50,7 @@ const INITIAL_GIFTS = [
     donor_name: 'Parents of the Bride',
     gift_type: 'cash',
     amount: 10000,
-    gift_name: '$10,000',
+    gift_name: '₹10,000',
     thank_you_status: 'pending',
     registry_item_name: 'Honeymoon Fund',
     created_at: '2026-05-26T11:05:00Z',
@@ -183,10 +183,10 @@ export default function GiftTracker({
             </div>
             <div className="text-right">
               <span className="font-headline-lg text-headline-lg text-primary block">
-                ${honeymoonReceived.toLocaleString()}
+                ₹{honeymoonReceived.toLocaleString()}
               </span>
               <span className="font-label-md text-label-md text-secondary">
-                of ${HONEYMOON_GOAL_AMOUNT.toLocaleString()}
+                of ₹{HONEYMOON_GOAL_AMOUNT.toLocaleString()}
               </span>
             </div>
           </div>
