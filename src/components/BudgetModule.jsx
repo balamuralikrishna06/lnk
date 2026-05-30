@@ -11,28 +11,34 @@ const INITIAL_CATEGORIES = [
   { id: 'cat-5', name: 'Miscellaneous', allocated: 4000, color: '#3a3b39' },    // Dark Charcoal
 ];
 
-export default function BudgetModule({ expenses }) {
+export default function BudgetModule({ expenses, weddingId }) {
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
   const [totalBudget, setTotalBudget] = useState(50000);
   
-  // TODO: Connect to Supabase
-  // Uncomment when integrating with Supabase backend table 'budget_allocations'
-  /*
   useEffect(() => {
     async function fetchAllocations() {
+      if (supabase.supabaseUrl.includes('mock.supabase.co')) {
+        return;
+      }
       try {
-        const { data, error } = await supabase.from('budget_allocations').select('*');
+        const { data, error } = await supabase
+          .from('budget_allocations')
+          .select('*')
+          .eq('wedding_id', weddingId);
         if (error) throw error;
         if (data && data.length > 0) {
-          setCategories(data);
+          const merged = INITIAL_CATEGORIES.map(cat => {
+            const dbMatch = data.find(item => item.id === cat.id);
+            return dbMatch ? { ...cat, allocated: Number(dbMatch.allocated), name: dbMatch.name } : cat;
+          });
+          setCategories(merged);
         }
       } catch (err) {
         console.error('Error fetching budget allocations:', err.message);
       }
     }
     fetchAllocations();
-  }, []);
-  */
+  }, [weddingId]);
 
   // Sum up spent amounts per category
   const getSpentForCategory = (catName) => {
@@ -81,19 +87,20 @@ export default function BudgetModule({ expenses }) {
       prev.map((c) => (c.id === id ? { ...c, allocated: Number(newVal) } : c))
     );
 
-    // TODO: Connect to Supabase
-    // Uncomment to update category budget allocation record in Supabase
-    /*
+    if (supabase.supabaseUrl.includes('mock.supabase.co')) {
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('budget_allocations')
         .update({ allocated: Number(newVal) })
-        .eq('id', id);
+        .eq('id', id)
+        .eq('wedding_id', weddingId);
       if (error) throw error;
     } catch (err) {
       console.error('Error updating allocation in Supabase:', err.message);
     }
-    */
   };
 
   return (

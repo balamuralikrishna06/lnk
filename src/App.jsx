@@ -192,7 +192,7 @@ export default function App() {
             )}
 
             {activeTab === 'budget' && (
-              <BudgetModule expenses={expenses} />
+              <BudgetModule expenses={expenses} weddingId={weddingId} />
             )}
 
             {activeTab === 'gifts' && (
