@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import PDFExportButton from './PDFExportButton';
 
 export default function Dashboard({
+  weddingId,
   gifts,
   expenses,
   photosCount,
@@ -49,13 +50,61 @@ export default function Dashboard({
     .reduce((sum, g) => sum + (g.amount || 0), 0);
   const registryPercent = Math.min(Math.round((registryReceived / registryGoal) * 100), 100);
 
-  // Prepare data payload for PDF
-  const weddingData = {
-    countdown: timeLeft,
-    budget: { total: totalBudget, spent: totalSpent, percent: budgetSpentPercent },
-    gifts: { count: gifts.length, received: registryReceived, goal: registryGoal, percent: registryPercent },
-    expensesSummary: expenses.slice(0, 5),
-    giftsSummary: gifts.slice(0, 5),
+  // n8n PDF Report Generator
+  const generateReportPDF = async (wedding_id) => {
+    const webhookUrl = 'https://balamuralikrishna06-n8n-free.hf.space/webhook/6159c71e-a13f-4a95-9db8-e7598da55831';
+    
+    const payload = {
+      timestamp: new Date().toISOString(),
+      platform: 'Modern Elegance Wedding Suite',
+      wedding_id: wedding_id,
+      data: {
+        countdown: timeLeft,
+        budget: { total: totalBudget, spent: totalSpent, percent: budgetSpentPercent },
+        gifts: { count: gifts.length, received: registryReceived, goal: registryGoal, percent: registryPercent },
+        expensesSummary: expenses.slice(0, 5),
+        giftsSummary: gifts.slice(0, 5),
+      }
+    };
+
+    console.log('[n8n Webhook] Posting report request for wedding ID:', wedding_id);
+    
+    try {
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`n8n PDF Generation Failed: ${response.statusText}`);
+      }
+
+      // Check for PDF stream or download URL
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/pdf')) {
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `Wedding_Summary_Report_${wedding_id}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } else {
+        const result = await response.json();
+        if (result.downloadUrl) {
+          window.open(result.downloadUrl, '_blank');
+        } else {
+          console.log('[n8n Webhook] Webhook response received successfully:', result);
+        }
+      }
+    } catch (err) {
+      console.error('[n8n Webhook] PDF generator execution failed:', err);
+      throw err; // bubble up for PDFExportButton state UI
+    }
   };
 
   // Recent lists
@@ -79,7 +128,7 @@ export default function Dashboard({
           </p>
         </div>
         <div className="w-full md:w-auto">
-          <PDFExportButton weddingData={weddingData} />
+          <PDFExportButton handleExport={() => generateReportPDF(weddingId)} />
         </div>
       </motion.div>
 
@@ -286,7 +335,7 @@ export default function Dashboard({
           </div>
 
           <div className="mt-8 text-center text-xs text-secondary font-body-md">
-            TODO: Connect to Supabase for data synchronizations.
+            Connected to Supabase data client.
           </div>
         </motion.div>
       </div>

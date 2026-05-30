@@ -1,45 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '../supabase';
-
-const INITIAL_PHOTOS = [
-  {
-    id: 'photo-1',
-    url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
-    caption: 'Our Ceremony Venue',
-    date: '2027-06-20',
-  },
-  {
-    id: 'photo-2',
-    url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80',
-    caption: 'Reception Dinner Tables',
-    date: '2027-06-20',
-  },
-  {
-    id: 'photo-3',
-    url: 'https://images.unsplash.com/photo-1543157148-f68f2d47a622?auto=format&fit=crop&w=800&q=80',
-    caption: 'Bridal Bouquet Floral Highlights',
-    date: '2027-06-20',
-  },
-  {
-    id: 'photo-4',
-    url: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=800&q=80',
-    caption: 'Intertwined Wedding Rings',
-    date: '2027-06-20',
-  },
-  {
-    id: 'photo-5',
-    url: 'https://images.unsplash.com/photo-1535254973040-607b474cb50d?auto=format&fit=crop&w=800&q=80',
-    caption: 'Decadent Wedding Cake & Patisserie',
-    date: '2027-06-20',
-  },
-  {
-    id: 'photo-6',
-    url: 'https://images.unsplash.com/photo-1519225495810-7517c300ea97?auto=format&fit=crop&w=800&q=80',
-    caption: 'Pre-wedding photoshoot portraits',
-    date: '2027-06-19',
-  },
-];
 
 const MOCK_PRESET_IMAGES = [
   'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=800&q=80',
@@ -48,32 +8,10 @@ const MOCK_PRESET_IMAGES = [
   'https://images.unsplash.com/photo-1520854221256-17451cc35953?auto=format&fit=crop&w=800&q=80',
 ];
 
-export default function AlbumModule({ photos, setPhotos, isAddPhotoOpen, setIsAddPhotoOpen }) {
+export default function AlbumModule({ photos, addPhoto, isAddPhotoOpen, setIsAddPhotoOpen }) {
   const [photoUrl, setPhotoUrl] = useState('');
   const [caption, setCaption] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-
-  // TODO: Connect to Supabase
-  // Uncomment lines below to query photos table from Supabase
-  /*
-  useEffect(() => {
-    async function fetchPhotos() {
-      try {
-        const { data, error } = await supabase
-          .from('photos')
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setPhotos(data);
-        }
-      } catch (err) {
-        console.error('Error fetching photos from Supabase:', err.message);
-      }
-    }
-    fetchPhotos();
-  }, []);
-  */
 
   const handleAddPhoto = async (e) => {
     e.preventDefault();
@@ -87,36 +25,15 @@ export default function AlbumModule({ photos, setPhotos, isAddPhotoOpen, setIsAd
       date,
     };
 
-    const localPhoto = {
-      id: `photo-${Date.now()}`,
-      ...newPhoto,
-    };
-
-    // Optimistic Update
-    setPhotos((prev) => [localPhoto, ...prev]);
-
-    // Reset Form
-    setPhotoUrl('');
-    setCaption('');
-    setIsAddPhotoOpen(false);
-
-    // TODO: Connect to Supabase
-    // Uncomment lines below to upload new photos details to Supabase table
-    /*
     try {
-      const { data, error } = await supabase
-        .from('photos')
-        .insert([newPhoto])
-        .select();
-      if (error) throw error;
-      if (data && data[0]) {
-        setPhotos((prev) => prev.map((p) => (p.id === localPhoto.id ? data[0] : p)));
-      }
+      await addPhoto(newPhoto);
+      // Reset Form
+      setPhotoUrl('');
+      setCaption('');
+      setIsAddPhotoOpen(false);
     } catch (err) {
-      console.error('Error uploading photo to Supabase:', err.message);
-      setPhotos((prev) => prev.filter((p) => p.id !== localPhoto.id));
+      console.error('Error adding photo via hook:', err);
     }
-    */
   };
 
   return (

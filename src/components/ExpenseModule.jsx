@@ -1,21 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { supabase } from '../supabase';
-
-const INITIAL_EXPENSES = [
-  { id: 'exp-1', name: 'Venue Deposit', amount: 15000, category: 'Venue', status: 'paid', date: '2026-05-10' },
-  { id: 'exp-2', name: 'Wedding Rings', amount: 4500, category: 'Attire', status: 'paid', date: '2026-05-15' },
-  { id: 'exp-3', name: 'Catering Deposit', amount: 2500, category: 'Catering', status: 'paid', date: '2026-05-18' },
-  { id: 'exp-4', name: 'DJ Downpayment', amount: 2000, category: 'Music', status: 'pending', date: '2026-05-20' },
-  { id: 'exp-5', name: 'Bridal Bouquet Booking', amount: 3500, category: 'Florals', status: 'paid', date: '2026-05-22' },
-  { id: 'exp-6', name: 'Photography Deposit', amount: 6000, category: 'Photography', status: 'paid', date: '2026-05-25' },
-  { id: 'exp-7', name: 'Printed Programs', amount: 500, category: 'Miscellaneous', status: 'pending', date: '2026-05-28' },
-];
 
 const CATEGORIES = ['Venue', 'Catering', 'Attire', 'Florals', 'Music', 'Photography', 'Miscellaneous'];
 
-export default function ExpenseModule({ expenses, setExpenses, isAddExpenseOpen, setIsAddExpenseOpen }) {
+export default function ExpenseModule({
+  expenses,
+  addExpense,
+  deleteExpense,
+  toggleExpenseStatus,
+  isAddExpenseOpen,
+  setIsAddExpenseOpen,
+}) {
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   
@@ -25,28 +21,6 @@ export default function ExpenseModule({ expenses, setExpenses, isAddExpenseOpen,
   const [category, setCategory] = useState('Venue');
   const [status, setStatus] = useState('pending');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-
-  // TODO: Connect to Supabase
-  // Uncomment the lines below to pull dynamic expense items from your Supabase 'expenses' table
-  /*
-  useEffect(() => {
-    async function fetchExpenses() {
-      try {
-        const { data, error } = await supabase
-          .from('expenses')
-          .select('*')
-          .order('date', { ascending: false });
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setExpenses(data);
-        }
-      } catch (err) {
-        console.error('Error fetching expenses from Supabase:', err.message);
-      }
-    }
-    fetchExpenses();
-  }, []);
-  */
 
   // Handlers
   const handleAddExpense = async (e) => {
@@ -61,88 +35,36 @@ export default function ExpenseModule({ expenses, setExpenses, isAddExpenseOpen,
       date,
     };
 
-    const localExpense = {
-      id: `exp-${Date.now()}`,
-      ...newExpense,
-    };
-
-    // Optimistic Update
-    setExpenses((prev) => [localExpense, ...prev]);
-
-    // Reset Form
-    setName('');
-    setAmount('');
-    setCategory('Venue');
-    setStatus('pending');
-    setIsAddExpenseOpen(false);
-
-    // TODO: Connect to Supabase
-    // Uncomment the lines below to push new expense inserts to Supabase
-    /*
     try {
-      const { data, error } = await supabase
-        .from('expenses')
-        .insert([newExpense])
-        .select();
-      if (error) throw error;
-      if (data && data[0]) {
-        setExpenses((prev) => prev.map((exp) => (exp.id === localExpense.id ? data[0] : exp)));
-      }
+      await addExpense(newExpense);
+      // Reset Form
+      setName('');
+      setAmount('');
+      setCategory('Venue');
+      setStatus('pending');
+      setIsAddExpenseOpen(false);
     } catch (err) {
-      console.error('Error saving expense to Supabase:', err.message);
-      setExpenses((prev) => prev.filter((exp) => exp.id !== localExpense.id));
+      console.error('Error adding expense to Supabase via hook:', err);
     }
-    */
   };
 
   const handleDeleteExpense = async (id) => {
-    // Optimistic Update
-    const removedExpense = expenses.find((exp) => exp.id === id);
-    setExpenses((prev) => prev.filter((exp) => exp.id !== id));
-
-    // TODO: Connect to Supabase
-    // Uncomment the lines below to sync deletions with your Supabase table
-    /*
     try {
-      const { error } = await supabase.from('expenses').delete().eq('id', id);
-      if (error) throw error;
+      await deleteExpense(id);
     } catch (err) {
-      console.error('Error deleting expense in Supabase:', err.message);
-      if (removedExpense) {
-        setExpenses((prev) => [removedExpense, ...prev]);
-      }
+      console.error('Error deleting expense via hook:', err);
     }
-    */
   };
 
-  const toggleExpenseStatus = async (id, currentStatus) => {
-    const nextStatus = currentStatus === 'paid' ? 'pending' : 'paid';
-
-    // Optimistic Update
-    setExpenses((prev) =>
-      prev.map((exp) => (exp.id === id ? { ...exp, status: nextStatus } : exp))
-    );
-
-    // TODO: Connect to Supabase
-    // Uncomment to update status in Supabase table
-    /*
+  const handleToggleStatus = async (id, currentStatus) => {
     try {
-      const { error } = await supabase
-        .from('expenses')
-        .update({ status: nextStatus })
-        .eq('id', id);
-      if (error) throw error;
+      await toggleExpenseStatus(id, currentStatus);
     } catch (err) {
-      console.error('Error toggling expense status in Supabase:', err.message);
-      setExpenses((prev) =>
-        prev.map((exp) => (exp.id === id ? { ...exp, status: currentStatus } : exp))
-      );
+      console.error('Error toggling status via hook:', err);
     }
-    */
   };
 
   // Computations for Recharts
-  // Group spent total per category
   const chartData = CATEGORIES.map((cat) => {
     const spent = expenses
       .filter((exp) => exp.category.toLowerCase() === cat.toLowerCase() || (cat === 'Venue' && exp.category === 'Catering')) // Group Venue/Catering to match budget
@@ -288,7 +210,7 @@ export default function ExpenseModule({ expenses, setExpenses, isAddExpenseOpen,
                     <td className="py-4 font-semibold text-[#2d2d2d]">${exp.amount.toLocaleString()}</td>
                     <td className="py-4">
                       <button
-                        onClick={() => toggleExpenseStatus(exp.id, exp.status)}
+                        onClick={() => handleToggleStatus(exp.id, exp.status)}
                         className={`px-3 py-1 rounded-full text-caption font-semibold border flex items-center gap-1 transition-colors select-none ${
                           exp.status === 'paid'
                             ? 'border-primary text-primary bg-primary/5'

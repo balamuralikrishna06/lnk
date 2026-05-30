@@ -67,106 +67,35 @@ const INITIAL_GIFTS = [
   }
 ];
 
-export default function GiftTracker({ isAddModalOpen, setIsAddModalOpen, gifts: propGifts, setGifts: propSetGifts }) {
-  // State Management
-  const [localGifts, setLocalGifts] = useState(INITIAL_GIFTS);
-  const gifts = propGifts || localGifts;
-  const setGifts = propSetGifts || setLocalGifts;
-  const [loading, setLoading] = useState(false);
+export default function GiftTracker({
+  isAddModalOpen,
+  setIsAddModalOpen,
+  gifts,
+  loading = false,
+  addGift,
+  toggleThankYouStatus
+}) {
   const [filterType, setFilterType] = useState('all'); // 'all' | 'cash' | 'physical'
   const [filterThankYou, setFilterThankYou] = useState('all'); // 'all' | 'pending' | 'sent'
 
   // Configurable Goals
   const HONEYMOON_GOAL_AMOUNT = 15000;
 
-  // Supabase Integration Hook
-  useEffect(() => {
-    async function fetchGifts() {
-      // TODO: Connect to Supabase
-      // Uncomment the lines below once you set up your Supabase project credentials in your .env file
-      /*
-      setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('gifts')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setGifts(data);
-        }
-      } catch (error) {
-        console.error('Error fetching gifts from Supabase:', error.message);
-      } finally {
-        setLoading(false);
-      }
-      */
-    }
-
-    fetchGifts();
-  }, []);
-
   // Handlers
   const handleAddGift = async (newGift) => {
-    // Generate temporary local ID
-    const localGift = {
-      id: `gift-${Date.now()}`,
-      ...newGift,
-    };
-
-    // Optimistic Update
-    setGifts((prev) => [localGift, ...prev]);
-
-    // TODO: Connect to Supabase
-    // Uncomment the lines below to insert new entries into your Supabase database table
-    /*
     try {
-      const { data, error } = await supabase
-        .from('gifts')
-        .insert([newGift])
-        .select();
-
-      if (error) throw error;
-      
-      // Update local state with the actual returned Supabase database record (containing DB UUID)
-      if (data && data[0]) {
-        setGifts((prev) => prev.map((g) => (g.id === localGift.id ? data[0] : g)));
-      }
-    } catch (error) {
-      console.error('Error adding gift to Supabase:', error.message);
-      // Rollback optimistic update on error
-      setGifts((prev) => prev.filter((g) => g.id !== localGift.id));
+      await addGift(newGift);
+    } catch (err) {
+      console.error('Error adding gift via hook:', err);
     }
-    */
   };
 
-  const toggleThankYouStatus = async (id, currentStatus) => {
-    const nextStatus = currentStatus === 'pending' ? 'sent' : 'pending';
-
-    // Optimistic Update
-    setGifts((prev) =>
-      prev.map((g) => (g.id === id ? { ...g, thank_you_status: nextStatus } : g))
-    );
-
-    // TODO: Connect to Supabase
-    // Uncomment the lines below to sync thank you status with Supabase
-    /*
+  const handleToggleThankYouStatus = async (id, currentStatus) => {
     try {
-      const { error } = await supabase
-        .from('gifts')
-        .update({ thank_you_status: nextStatus })
-        .eq('id', id);
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error updating thank you status in Supabase:', error.message);
-      // Rollback optimistic update on error
-      setGifts((prev) =>
-        prev.map((g) => (g.id === id ? { ...g, thank_you_status: currentStatus } : g))
-      );
+      await toggleThankYouStatus(id, currentStatus);
+    } catch (err) {
+      console.error('Error updating thank you status via hook:', err);
     }
-    */
   };
 
   // Dynamic Computations
@@ -412,7 +341,7 @@ export default function GiftTracker({ isAddModalOpen, setIsAddModalOpen, gifts: 
                       
                       {/* Thank You Note Interactive Button */}
                       <button
-                        onClick={() => toggleThankYouStatus(gift.id, gift.thank_you_status)}
+                        onClick={() => handleToggleThankYouStatus(gift.id, gift.thank_you_status)}
                         className={`font-caption text-caption flex items-center mt-1 transition-colors ${
                           gift.thank_you_status === 'sent'
                             ? 'text-primary'

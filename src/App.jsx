@@ -6,41 +6,36 @@ import ExpenseModule from './components/ExpenseModule';
 import GiftTracker from './components/GiftTracker';
 import AlbumModule from './components/AlbumModule';
 
-const INITIAL_EXPENSES = [
-  { id: 'exp-1', name: 'Venue Deposit', amount: 15000, category: 'Venue', status: 'paid', date: '2026-05-10' },
-  { id: 'exp-2', name: 'Wedding Rings', amount: 4500, category: 'Attire', status: 'paid', date: '2026-05-15' },
-  { id: 'exp-3', name: 'Catering Deposit', amount: 2500, category: 'Catering', status: 'paid', date: '2026-05-18' },
-  { id: 'exp-4', name: 'DJ Downpayment', amount: 2000, category: 'Music', status: 'pending', date: '2026-05-20' },
-  { id: 'exp-5', name: 'Bridal Bouquet Booking', amount: 3500, category: 'Florals', status: 'paid', date: '2026-05-22' },
-  { id: 'exp-6', name: 'Photography Deposit', amount: 6000, category: 'Photography', status: 'paid', date: '2026-05-25' },
-  { id: 'exp-7', name: 'Printed Programs', amount: 500, category: 'Miscellaneous', status: 'pending', date: '2026-05-28' },
-];
-
-const INITIAL_GIFTS = [
-  { id: 'gift-1', donor_name: 'Eleanor & James Wright', gift_type: 'cash', amount: 500, gift_name: '$500', thank_you_status: 'pending', registry_item_name: 'Honeymoon Fund', created_at: '2026-05-30T10:15:00Z' },
-  { id: 'gift-2', donor_name: 'The Smith Family', gift_type: 'physical', amount: null, gift_name: 'Espresso Machine', thank_you_status: 'pending', registry_item_name: 'Registry Item', created_at: '2026-05-29T16:45:00Z' },
-  { id: 'gift-3', donor_name: 'Aunt Martha', gift_type: 'cash', amount: 250, gift_name: '$250', thank_you_status: 'sent', registry_item_name: 'Honeymoon Fund', created_at: '2026-05-28T09:30:00Z' },
-  { id: 'gift-4', donor_name: 'The Davidson Cousins', gift_type: 'cash', amount: 1200, gift_name: '$1,200', thank_you_status: 'sent', registry_item_name: 'Honeymoon Fund', created_at: '2026-05-27T14:20:00Z' },
-  { id: 'gift-5', donor_name: 'Parents of the Bride', gift_type: 'cash', amount: 10000, gift_name: '$10,000', thank_you_status: 'pending', registry_item_name: 'Honeymoon Fund', created_at: '2026-05-26T11:05:00Z' },
-  { id: 'gift-6', donor_name: 'Sarah & Michael Green', gift_type: 'physical', amount: null, gift_name: 'KitchenAid Stand Mixer', thank_you_status: 'sent', registry_item_name: 'Kitchen Registry', created_at: '2026-05-25T18:00:00Z' }
-];
-
-const INITIAL_PHOTOS = [
-  { id: 'photo-1', url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80', caption: 'Our Ceremony Venue', date: '2027-06-20' },
-  { id: 'photo-2', url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80', caption: 'Reception Dinner Tables', date: '2027-06-20' },
-  { id: 'photo-3', url: 'https://images.unsplash.com/photo-1543157148-f68f2d47a622?auto=format&fit=crop&w=800&q=80', caption: 'Bridal Bouquet Floral Highlights', date: '2027-06-20' },
-  { id: 'photo-4', url: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=800&q=80', caption: 'Intertwined Wedding Rings', date: '2027-06-20' },
-  { id: 'photo-5', url: 'https://images.unsplash.com/photo-1535254973040-607b474cb50d?auto=format&fit=crop&w=800&q=80', caption: 'Decadent Wedding Cake & Patisserie', date: '2027-06-20' },
-  { id: 'photo-6', url: 'https://images.unsplash.com/photo-1519225495810-7517c300ea97?auto=format&fit=crop&w=800&q=80', caption: 'Pre-wedding photoshoot portraits', date: '2027-06-19' },
-];
+// Centralized Hooks
+import useExpenses from './hooks/useExpenses';
+import useGifts from './hooks/useGifts';
+import useAlbum from './hooks/useAlbum';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard | expenses | budget | gifts | album
   
-  // Shared Elevated States
-  const [expenses, setExpenses] = useState(INITIAL_EXPENSES);
-  const [gifts, setGifts] = useState(INITIAL_GIFTS);
-  const [photos, setPhotos] = useState(INITIAL_PHOTOS);
+  // RLS Tenant Wedding Session Configuration
+  const weddingId = 'wedding-5304044892632406089';
+
+  // Supabase Custom Hooks
+  const {
+    expenses,
+    addExpense,
+    deleteExpense,
+    toggleExpenseStatus
+  } = useExpenses(weddingId);
+
+  const {
+    gifts,
+    loading: giftsLoading,
+    addGift,
+    toggleThankYouStatus
+  } = useGifts(weddingId);
+
+  const {
+    photos,
+    addPhoto
+  } = useAlbum(weddingId);
 
   // Modals Open State
   const [isAddGiftOpen, setIsAddGiftOpen] = useState(false);
@@ -170,6 +165,7 @@ export default function App() {
           >
             {activeTab === 'dashboard' && (
               <Dashboard
+                weddingId={weddingId}
                 gifts={gifts}
                 expenses={expenses}
                 photosCount={photos.length}
@@ -183,7 +179,9 @@ export default function App() {
             {activeTab === 'expenses' && (
               <ExpenseModule
                 expenses={expenses}
-                setExpenses={setExpenses}
+                addExpense={addExpense}
+                deleteExpense={deleteExpense}
+                toggleExpenseStatus={toggleExpenseStatus}
                 isAddExpenseOpen={isAddExpenseOpen}
                 setIsAddExpenseOpen={setIsAddExpenseOpen}
               />
@@ -196,7 +194,9 @@ export default function App() {
             {activeTab === 'gifts' && (
               <GiftTracker
                 gifts={gifts}
-                setGifts={setGifts}
+                loading={giftsLoading}
+                addGift={addGift}
+                toggleThankYouStatus={toggleThankYouStatus}
                 isAddModalOpen={isAddGiftOpen}
                 setIsAddModalOpen={setIsAddGiftOpen}
               />
@@ -205,7 +205,7 @@ export default function App() {
             {activeTab === 'album' && (
               <AlbumModule
                 photos={photos}
-                setPhotos={setPhotos}
+                addPhoto={addPhoto}
                 isAddPhotoOpen={isAddPhotoOpen}
                 setIsAddPhotoOpen={setIsAddPhotoOpen}
               />

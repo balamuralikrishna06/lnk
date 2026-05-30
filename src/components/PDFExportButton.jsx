@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
-export default function PDFExportButton({ weddingData }) {
+export default function PDFExportButton({ weddingData, handleExport }) {
   const [exporting, setExporting] = useState(false);
   const [status, setStatus] = useState(null); // 'success' | 'error' | null
 
@@ -9,58 +9,63 @@ export default function PDFExportButton({ weddingData }) {
     setExporting(true);
     setStatus(null);
 
-    const webhookUrl = import.meta.env.VITE_N8N_PDF_WEBHOOK_URL || '';
-    
-    // Prepare payload
-    const payload = {
-      timestamp: new Date().toISOString(),
-      platform: 'Modern Elegance Wedding Suite',
-      data: weddingData,
-    };
-
-    console.log('[PDF Export] Initiating report download...', payload);
-
     try {
-      if (!webhookUrl) {
-        // Mock network delay if no webhook url is configured
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        console.log('[PDF Export] Success (Mock mode). Payload:', payload);
+      if (handleExport) {
+        await handleExport();
         setStatus('success');
       } else {
-        // Send request to n8n webhook
-        const response = await fetch(webhookUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
+        const webhookUrl = import.meta.env.VITE_N8N_PDF_WEBHOOK_URL || '';
+        
+        // Prepare payload
+        const payload = {
+          timestamp: new Date().toISOString(),
+          platform: 'Modern Elegance Wedding Suite',
+          data: weddingData,
+        };
 
-        if (!response.ok) {
-          throw new Error(`Webhook response error: ${response.statusText}`);
-        }
+        console.log('[PDF Export] Initiating report download...', payload);
 
-        // Check if response contains a blob (PDF) or a JSON link
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/pdf')) {
-          const blob = await response.blob();
-          const downloadUrl = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = downloadUrl;
-          link.download = `Wedding_Summary_Report_${new Date().toISOString().split('T')[0]}.pdf`;
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
+        if (!webhookUrl) {
+          // Mock network delay if no webhook url is configured
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          console.log('[PDF Export] Success (Mock mode). Payload:', payload);
+          setStatus('success');
         } else {
-          // Assume JSON response containing download URL
-          const result = await response.json();
-          if (result.downloadUrl) {
-            window.open(result.downloadUrl, '_blank');
-          } else {
-            console.log('[PDF Export] Webhook triggered successfully:', result);
+          // Send request to n8n webhook
+          const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Webhook response error: ${response.statusText}`);
           }
+
+          // Check if response contains a blob (PDF) or a JSON link
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/pdf')) {
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `Wedding_Summary_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+          } else {
+            // Assume JSON response containing download URL
+            const result = await response.json();
+            if (result.downloadUrl) {
+              window.open(result.downloadUrl, '_blank');
+            } else {
+              console.log('[PDF Export] Webhook triggered successfully:', result);
+            }
+          }
+          setStatus('success');
         }
-        setStatus('success');
       }
     } catch (err) {
       console.error('[PDF Export] Failed to download PDF:', err);
