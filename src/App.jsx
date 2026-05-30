@@ -20,6 +20,8 @@ export default function App() {
   // Supabase Custom Hooks
   const {
     expenses,
+    loading: expensesLoading,
+    error: expensesError,
     addExpense,
     deleteExpense,
     toggleExpenseStatus
@@ -179,6 +181,8 @@ export default function App() {
             {activeTab === 'expenses' && (
               <ExpenseModule
                 expenses={expenses}
+                loading={expensesLoading}
+                error={expensesError}
                 addExpense={addExpense}
                 deleteExpense={deleteExpense}
                 toggleExpenseStatus={toggleExpenseStatus}

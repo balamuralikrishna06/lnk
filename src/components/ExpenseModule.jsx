@@ -11,6 +11,8 @@ export default function ExpenseModule({
   toggleExpenseStatus,
   isAddExpenseOpen,
   setIsAddExpenseOpen,
+  loading,
+  error,
 }) {
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -184,7 +186,15 @@ export default function ExpenseModule({
         </div>
 
         {/* Expenses List / Table */}
-        {filteredExpenses.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-12 text-secondary font-body-md">
+            Loading expenses...
+          </div>
+        ) : error ? (
+          <div className="text-center py-12 text-error bg-error/5 border border-error/20 rounded-lg font-body-md p-4 mb-6">
+            Error loading expenses: {error}
+          </div>
+        ) : filteredExpenses.length === 0 ? (
           <div className="text-center py-12 text-secondary font-body-md">
             No expenses found matching the selected filters.
           </div>

@@ -1,10 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
+import supabase from './lib/supabaseClient';
 
-// Read environmental variables. If not defined, fallback to mock values to prevent application crashes during local development.
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-supabase-url.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-supabase-anon-key';
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export { supabase };
 
 /**
  * DATABASE SCHEMA REFERENCE

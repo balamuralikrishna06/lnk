@@ -12,20 +12,20 @@ const INITIAL_EXPENSES = [
 ];
 
 export default function useExpenses(weddingId) {
-  const [expenses, setExpenses] = useState(INITIAL_EXPENSES);
+  const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchExpenses = async () => {
-    // If client is using mock keys, skip Supabase fetch
+    // If client is using mock keys, load mock data to prevent blank screen
     if (supabase.supabaseUrl.includes('mock.supabase.co')) {
+      setExpenses(INITIAL_EXPENSES);
       return;
     }
 
     setLoading(true);
     setError(null);
     try {
-      // TODO: Connect to Supabase
       const { data, error: fetchErr } = await supabase
         .from('expenses')
         .select('*')
