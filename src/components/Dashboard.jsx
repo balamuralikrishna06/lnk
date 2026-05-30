@@ -14,8 +14,8 @@ export default function Dashboard({
 }) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  // Target wedding date: June 20, 2027
-  const weddingDate = new Date('2027-06-20T16:00:00');
+  // Target wedding date: July 7, 2026
+  const weddingDate = new Date('2026-07-07T16:00:00');
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -142,7 +142,7 @@ export default function Dashboard({
         <div className="text-center md:text-left">
           <h3 className="font-headline-md text-headline-md text-white mb-1">The Countdown</h3>
           <p className="font-caption text-caption text-[#FAF9F6]/60 uppercase tracking-wider">
-            June 20, 2027 • Amalfi Coast, Italy
+            July 7, 2026 • Jayam Mahal, Tirunelveli
           </p>
         </div>
         <div className="flex gap-4 md:gap-8 justify-center flex-wrap">
