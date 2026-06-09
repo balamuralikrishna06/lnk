@@ -26,7 +26,7 @@ export default function GiftTracker({
     setSharing(true);
     setShareStatus(null);
 
-    const webhookUrl = 'https://balamuralikrishna06-n8n-free.hf.space/webhook/6159c71e-a13f-4a95-9db8-e7598da55831';
+    const webhookUrl = 'https://balamuralikrishna06-n8n-free.hf.space/webhook/6159c71e-a13f-4a95-9db8-e7598da5583';
 
     const payload = {
       action: 'share_registry',
