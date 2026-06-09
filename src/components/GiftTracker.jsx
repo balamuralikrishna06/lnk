@@ -59,6 +59,27 @@ export default function GiftTracker({
         throw new Error(`Webhook Trigger Failed: ${response.statusText}`);
       }
 
+      // Check if response contains a blob (PDF) or a JSON link
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/pdf')) {
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `Wedding_Gift_Registry_${weddingId || 'details'}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } else {
+        // Assume JSON response containing download URL
+        const result = await response.json();
+        if (result.downloadUrl) {
+          window.open(result.downloadUrl, '_blank');
+        } else {
+          console.log('[n8n Webhook] Webhook response received successfully:', result);
+        }
+      }
+
       console.log('[n8n Webhook] Registry shared successfully!');
       setShareStatus('success');
     } catch (err) {
