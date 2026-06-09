@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Dashboard from './components/Dashboard';
 import BudgetModule from './components/BudgetModule';
@@ -203,6 +203,7 @@ export default function App() {
                 toggleThankYouStatus={toggleThankYouStatus}
                 isAddModalOpen={isAddGiftOpen}
                 setIsAddModalOpen={setIsAddGiftOpen}
+                weddingId={weddingId}
               />
             )}
 

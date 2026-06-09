@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '../supabase';
 import GiftFormModal from './GiftFormModal';
 
 // No mock data stored here
@@ -12,13 +11,64 @@ export default function GiftTracker({
   gifts,
   loading = false,
   addGift,
-  toggleThankYouStatus
+  toggleThankYouStatus,
+  weddingId
 }) {
   const [filterType, setFilterType] = useState('all'); // 'all' | 'cash' | 'physical'
   const [filterThankYou, setFilterThankYou] = useState('all'); // 'all' | 'pending' | 'sent'
+  const [sharing, setSharing] = useState(false);
+  const [shareStatus, setShareStatus] = useState(null); // 'success' | 'error' | null
 
   // Configurable Goals
   const HONEYMOON_GOAL_AMOUNT = 15000;
+
+  const handleShareRegistry = async () => {
+    setSharing(true);
+    setShareStatus(null);
+
+    const webhookUrl = 'https://balamuralikrishna06-n8n-free.hf.space/webhook/6159c71e-a13f-4a95-9db8-e7598da55831';
+
+    const payload = {
+      action: 'share_registry',
+      timestamp: new Date().toISOString(),
+      platform: 'Modern Elegance Wedding Suite',
+      wedding_id: weddingId,
+      data: {
+        gifts: gifts,
+        totalGiftsCount,
+        pendingThanksCount,
+        physicalGiftsCount,
+        honeymoonGoalAmount: HONEYMOON_GOAL_AMOUNT,
+        honeymoonReceived,
+        honeymoonPercentage,
+      }
+    };
+
+    console.log('[n8n Webhook] Sharing registry payload:', payload);
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook Trigger Failed: ${response.statusText}`);
+      }
+
+      console.log('[n8n Webhook] Registry shared successfully!');
+      setShareStatus('success');
+    } catch (err) {
+      console.error('[n8n Webhook] Error sharing registry:', err);
+      setShareStatus('error');
+    } finally {
+      setSharing(false);
+      setTimeout(() => setShareStatus(null), 4000);
+    }
+  };
 
   // Handlers
   const handleAddGift = async (newGift) => {
@@ -94,15 +144,54 @@ export default function GiftTracker({
             Track contributions and manage thank-you notes for your special day.
           </p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-col items-start md:items-end gap-2">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="px-6 py-3 border border-[#2D2D2D]/20 rounded-lg font-label-md text-label-md text-[#2D2D2D] hover:bg-surface-variant transition-colors flex items-center bg-white shadow-sm"
+            onClick={handleShareRegistry}
+            disabled={sharing}
+            className="px-6 py-3 border border-[#2D2D2D]/20 rounded-lg font-label-md text-label-md text-[#2D2D2D] hover:bg-surface-variant transition-colors flex items-center bg-white shadow-sm disabled:opacity-50"
           >
-            <span className="material-symbols-outlined mr-2 text-[18px]">ios_share</span>
-            Share Registry
+            {sharing ? (
+              <>
+                <svg className="animate-spin h-4 w-4 mr-2 text-[#2D2D2D]" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                <span>Sharing...</span>
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined mr-2 text-[18px]">ios_share</span>
+                Share Registry
+              </>
+            )}
           </motion.button>
+          
+          <AnimatePresence>
+            {shareStatus === 'success' && (
+              <motion.p
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="text-xs font-semibold text-primary flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                Registry shared successfully!
+              </motion.p>
+            )}
+            {shareStatus === 'error' && (
+              <motion.p
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="text-xs font-semibold text-error flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-[14px]">error</span>
+                Failed to share registry.
+              </motion.p>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
 

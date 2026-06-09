@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { supabase } from '../supabase';
@@ -65,7 +65,6 @@ export default function BudgetModule({ expenses, weddingId }) {
 
   const totalSpent = categoryData.reduce((sum, cat) => sum + cat.spent, 0);
   const remainingBudget = Math.max(totalBudget - totalSpent, 0);
-  const totalAllocated = categories.reduce((sum, cat) => sum + cat.allocated, 0);
 
   // Data for the Donut Chart (Pie)
   // We plot the spent allocations by category plus the remaining unspent budget
